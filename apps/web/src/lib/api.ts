@@ -73,6 +73,10 @@ export const api = {
     salesInsights: () => fetchApi('/ai/sales-insights'),
     recommendations: () => fetchApi('/ai/recommendations'),
   },
+  reviews: {
+    create: (data: { productId: string; rating: number; comment: string }) => fetchApi('/reviews', { method: 'POST', body: JSON.stringify(data) }),
+    listByProduct: (productId: string) => fetchApi(`/reviews/product/${productId}`),
+  },
   admin: {
     users: (params?: Record<string, string>) => fetchApi(`/admin/users?${new URLSearchParams(params).toString()}`),
     updateRole: (id: string, role: string) => fetchApi(`/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import { ProductActions } from './product-actions';
+import { ReviewForm } from './reviews';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,8 +40,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </div>
       </div>
 
-      <div className="mt-12">
-        <h2 className="mb-6 text-2xl font-bold">Reviews</h2>
+      <div className="mt-12 space-y-6">
+        <h2 className="text-2xl font-bold">Reviews</h2>
+        <ReviewForm productId={product.id} onSubmit={() => { if (typeof window !== 'undefined') window.location.reload(); }} />
         {product.reviews?.length ? (
           <div className="grid gap-4">
             {product.reviews.map((review: any) => (
