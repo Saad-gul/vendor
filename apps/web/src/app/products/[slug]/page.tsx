@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 import { Star } from 'lucide-react';
+import { ProductActions } from './product-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +35,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
           <p className="text-2xl font-semibold">{formatPrice(product.price)}</p>
           <p className="text-muted-foreground">{product.description}</p>
-          <Button size="lg">Add to Cart</Button>
+          <ProductActions productId={product.id} />
         </div>
       </div>
 
