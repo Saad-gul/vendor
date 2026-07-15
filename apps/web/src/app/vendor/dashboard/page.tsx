@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatPrice } from '@/lib/utils';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 export default function VendorDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -46,13 +47,30 @@ export default function VendorDashboard() {
               { label: 'Total Revenue', value: stats.totalRevenue ?? '-' },
               { label: 'Total Orders', value: stats.totalOrders ?? '-' },
               { label: 'Total Products', value: stats.totalProducts ?? '-' },
-              { label: 'Total Customers', value: stats.totalCustomers ?? '-' },
+              { label: 'Low Stock Items', value: stats.lowStockProducts ?? '-' },
             ].map((c) => (
               <Card key={c.label}>
                 <CardHeader><CardTitle className="text-sm font-medium text-muted-foreground">{c.label}</CardTitle></CardHeader>
                 <CardContent><p className="text-3xl font-bold">{c.value}</p></CardContent>
               </Card>
             ))}
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Revenue by Month</CardTitle></CardHeader>
+              <CardContent className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.salesByMonth || []}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => formatPrice(value)} />
+                    <Bar dataKey="revenue" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <SalesInsights />
           </div>
         </TabsContent>
         <TabsContent value="products">
@@ -69,9 +87,35 @@ export default function VendorDashboard() {
   );
 }
 
+function SalesInsights() {
+  const [insights, setInsights] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const res = await api.ai.salesInsights().catch(() => null);
+      setInsights(res?.data?.insights || 'AI insights unavailable');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader><CardTitle>AI Sales Insights</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground whitespace-pre-line">{insights || 'Click below to generate AI sales insights.'}</p>
+        <Button onClick={load} disabled={loading} size="sm">{loading ? 'Generating...' : 'Generate Insights'}</Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ProductManager({ products, categories, onChange }: { products: any[]; categories: any[]; onChange: () => void }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({});
+  const [aiLoading, setAiLoading] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,6 +123,17 @@ function ProductManager({ products, categories, onChange }: { products: any[]; c
     setOpen(false);
     setForm({});
     onChange();
+  }
+
+  async function generateDescription() {
+    if (!form.name) return;
+    setAiLoading(true);
+    try {
+      const res = await api.ai.productDescription({ name: form.name, keywords: form.tags ? form.tags.split(',') : [] });
+      setForm({ ...form, description: res.data.description });
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   async function deleteProduct(id: string) {
@@ -106,7 +161,14 @@ function ProductManager({ products, categories, onChange }: { products: any[]; c
               <div><Label>Price</Label><Input type="number" value={form.price || ''} onChange={(e) => setForm({ ...form, price: e.target.value })} required /></div>
               <div><Label>Stock</Label><Input type="number" value={form.stock || ''} onChange={(e) => setForm({ ...form, stock: e.target.value })} required /></div>
               <div><Label>SKU</Label><Input value={form.sku || ''} onChange={(e) => setForm({ ...form, sku: e.target.value })} /></div>
-              <div><Label>Description</Label><Textarea value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <div><Label>Tags (comma separated)</Label><Input value={form.tags || ''} onChange={(e) => setForm({ ...form, tags: e.target.value })} /></div>
+              <div>
+                <Label>Description</Label>
+                <Textarea value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <Button type="button" variant="outline" size="sm" className="mt-2" onClick={generateDescription} disabled={aiLoading}>
+                  {aiLoading ? 'Generating...' : 'Generate with AI'}
+                </Button>
+              </div>
               <Button type="submit" className="w-full">Create Product</Button>
             </form>
           </DialogContent>

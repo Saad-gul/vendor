@@ -1,19 +1,29 @@
-import Link from 'next/link';
 import { api } from '@/lib/api';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { formatPrice, truncate } from '@/lib/utils';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductsPage() {
-  const { data } = await api.products.list().catch(() => ({ data: { data: [] } }));
+export default async function ProductsPage({ searchParams }: { searchParams: { q?: string; category?: string } }) {
+  const q = searchParams.q;
+  const category = searchParams.category;
+  const res = q
+    ? await api.search.products(q, category ? { categoryId: category } : undefined).catch(() => ({ data: { data: [] } }))
+    : await api.products.list(category ? { categoryId: category } : undefined).catch(() => ({ data: { data: [] } }));
+  const products = res.data.data || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold">Products</h1>
+      <form action="/products" method="get" className="mb-8 flex gap-2">
+        <Input name="q" defaultValue={q} placeholder="Search products..." className="max-w-md" />
+        <Button type="submit">Search</Button>
+      </form>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {data.data.map((product: any) => (
+        {products.map((product: any) => (
           <Card key={product.id} className="flex flex-col overflow-hidden">
             <div className="aspect-square w-full bg-muted">
               {product.images[0] ? (
