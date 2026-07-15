@@ -65,6 +65,14 @@ export const api = {
     platform: () => fetchApi('/analytics/platform'),
     vendor: () => fetchApi('/analytics/vendor'),
   },
+  search: {
+    products: (q: string, params?: Record<string, string>) => fetchApi(`/search/products?q=${encodeURIComponent(q)}&${new URLSearchParams(params).toString()}`),
+  },
+  ai: {
+    productDescription: (body: { name: string; category?: string; keywords?: string[] }) => fetchApi('/ai/product-description', { method: 'POST', body: JSON.stringify(body) }),
+    salesInsights: () => fetchApi('/ai/sales-insights'),
+    recommendations: () => fetchApi('/ai/recommendations'),
+  },
   admin: {
     users: (params?: Record<string, string>) => fetchApi(`/admin/users?${new URLSearchParams(params).toString()}`),
     updateRole: (id: string, role: string) => fetchApi(`/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),

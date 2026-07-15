@@ -28,6 +28,7 @@ export class AnalyticsService {
       totalOrders,
       totalRevenue: totalRevenue._sum.total?.toNumber() || 0,
       pendingVendors,
+      salesByMonth: await this.getMonthlySales(),
     };
     await this.redis.set(cacheKey, result, 300);
     return result;
