@@ -6,10 +6,10 @@ import { formatPrice } from '@/lib/utils';
 export const dynamic = 'force-dynamic';
 
 export default async function OrderDetailPage({ params }: { params: { id: string } }) {
-  const { data } = await api.orders.get(params.id).catch(() => null);
-  if (!data) notFound();
+  const result = await api.orders.get(params.id).catch(() => null);
+  if (!result) notFound();
 
-  const order = data.data;
+  const order = result.data;
 
   const steps = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
   const stepIndex = steps.indexOf(order.status);

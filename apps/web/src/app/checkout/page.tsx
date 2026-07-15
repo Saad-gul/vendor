@@ -31,7 +31,7 @@ export default function CheckoutPage() {
     setError('');
     try {
       const res = await api.orders.create({ shippingAddress: address });
-      const orders = res.data.data || [];
+      const orders = res.data || [];
       if (!orders.length) throw new Error('No orders created');
       const order = orders[0];
       setOrderId(order.id);
