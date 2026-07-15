@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { api } from '@/lib/api';
@@ -55,6 +56,23 @@ export default function LoginPage() {
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
+            <div className="my-4 flex items-center gap-2">
+              <Separator className="flex-1" />
+              <span className="text-xs text-muted-foreground">OR</span>
+              <Separator className="flex-1" />
+            </div>
+            <div className="grid gap-2">
+              <Button variant="outline" className="w-full" asChild>
+                <a href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}/api/v1/auth/google`}>
+                  Continue with Google
+                </a>
+              </Button>
+              <Button variant="outline" className="w-full" asChild>
+                <a href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}/api/v1/auth/github`}>
+                  Continue with GitHub
+                </a>
+              </Button>
+            </div>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
               <Link href="/register" className="text-primary hover:underline">
