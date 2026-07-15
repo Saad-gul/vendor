@@ -1,0 +1,9 @@
+export const APP_NAME = 'Marketverse';
+export const DEFAULT_PAGE_LIMIT = 20;
+export const MAX_PAGE_LIMIT = 100;
+export const ACCESS_TOKEN_EXPIRY = '15m';
+export const REFRESH_TOKEN_EXPIRY_DAYS = 7;
+export const DEFAULT_VENDOR_COMMISSION = 10;
+export const LOW_STOCK_THRESHOLD = 10;
+export const REDIS_CACHE_TTL = 300;
+export const ROLES = ['CUSTOMER', 'VENDOR', 'ADMIN'] as const;
