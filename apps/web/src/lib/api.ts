@@ -47,7 +47,13 @@ export const api = {
   orders: {
     create: (data: { shippingAddress: Record<string, string> }) => fetchApi('/orders', { method: 'POST', body: JSON.stringify(data) }),
     list: () => fetchApi('/orders'),
+    get: (id: string) => fetchApi(`/orders/${id}`),
     updateStatus: (id: string, status: string) => fetchApi(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  },
+  wishlist: {
+    get: () => fetchApi('/wishlist'),
+    add: (productId: string) => fetchApi(`/wishlist/${productId}`, { method: 'POST' }),
+    remove: (productId: string) => fetchApi(`/wishlist/${productId}`, { method: 'DELETE' }),
   },
   coupons: {
     list: () => fetchApi('/coupons'),
