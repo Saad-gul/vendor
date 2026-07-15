@@ -28,7 +28,12 @@ export const api = {
   },
   products: {
     list: (params?: Record<string, string>) => fetchApi(`/products?${new URLSearchParams(params).toString()}`),
+    listMy: () => fetchApi('/products/my'),
     get: (slug: string) => fetchApi(`/products/${slug}`),
+    create: (data: Record<string, unknown>) => fetchApi('/products', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: Record<string, unknown>) => fetchApi(`/products/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    updateStock: (id: string, stock: number) => fetchApi(`/products/${id}/stock`, { method: 'PATCH', body: JSON.stringify({ stock }) }),
+    delete: (id: string) => fetchApi(`/products/${id}`, { method: 'DELETE' }),
   },
   categories: {
     list: () => fetchApi('/categories'),
@@ -36,13 +41,31 @@ export const api = {
   cart: {
     get: () => fetchApi('/cart'),
     add: (data: { productId: string; quantity?: number }) => fetchApi('/cart/items', { method: 'POST', body: JSON.stringify(data) }),
+    update: (productId: string, quantity: number) => fetchApi(`/cart/items/${productId}`, { method: 'PATCH', body: JSON.stringify({ quantity }) }),
+    remove: (productId: string) => fetchApi(`/cart/items/${productId}`, { method: 'DELETE' }),
   },
   orders: {
     create: (data: { shippingAddress: Record<string, string> }) => fetchApi('/orders', { method: 'POST', body: JSON.stringify(data) }),
     list: () => fetchApi('/orders'),
+    updateStatus: (id: string, status: string) => fetchApi(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  },
+  coupons: {
+    list: () => fetchApi('/coupons'),
+    create: (data: Record<string, unknown>) => fetchApi('/coupons', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: Record<string, unknown>) => fetchApi(`/coupons/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id: string) => fetchApi(`/coupons/${id}`, { method: 'DELETE' }),
   },
   analytics: {
     platform: () => fetchApi('/analytics/platform'),
     vendor: () => fetchApi('/analytics/vendor'),
+  },
+  admin: {
+    users: (params?: Record<string, string>) => fetchApi(`/admin/users?${new URLSearchParams(params).toString()}`),
+    updateRole: (id: string, role: string) => fetchApi(`/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+    pendingVendors: () => fetchApi('/admin/vendors/pending'),
+    verifyVendor: (id: string) => fetchApi(`/admin/vendors/${id}/verify`, { method: 'PATCH' }),
+    products: () => fetchApi('/admin/products'),
+    suspendProduct: (id: string) => fetchApi(`/admin/products/${id}/suspend`, { method: 'PATCH' }),
+    updateCommission: (id: string, commissionRate: number) => fetchApi(`/admin/vendors/${id}/commission`, { method: 'PATCH', body: JSON.stringify({ commissionRate }) }),
   },
 };

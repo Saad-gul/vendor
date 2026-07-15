@@ -31,6 +31,16 @@ export class ProductsController {
     return { success: true, data: await this.productsService.findAll(query) };
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.VENDOR, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List my products (vendor/admin)' })
+  async findMyProducts(@CurrentUser('vendorId') vendorId: string | undefined) {
+    if (!vendorId) throw new Error('Vendor not found');
+    return { success: true, data: await this.productsService.findAll({ vendorId } as ProductQueryDto, true) };
+  }
+
   @Get(':slug')
   @ApiOperation({ summary: 'Get product by slug' })
   async findBySlug(@Param('slug') slug: string) {
