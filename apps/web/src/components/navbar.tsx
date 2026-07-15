@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useAuth } from './auth-provider';
 import { ModeToggle } from './mode-toggle';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Store } from 'lucide-react';
+import { ShoppingCart, Store, User } from 'lucide-react';
 
 export function Navbar() {
+  const { user } = useAuth();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass">
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -18,17 +21,29 @@ export function Navbar() {
           <Link href="/products">
             <Button variant="ghost">Products</Button>
           </Link>
-          <Link href="/login">
-            <Button variant="ghost">Login</Button>
-          </Link>
-          <Link href="/register">
-            <Button>Get Started</Button>
-          </Link>
-          <Link href="/cart">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <Link href="/cart">
+                <Button variant="ghost" size="icon">
+                  <ShoppingCart className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href={user.role === 'ADMIN' ? '/admin/dashboard' : user.role === 'VENDOR' ? '/vendor/dashboard' : '/dashboard'}>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link href="/register">
+                <Button>Get Started</Button>
+              </Link>
+            </>
+          )}
           <ModeToggle />
         </div>
       </nav>
